@@ -26,57 +26,96 @@ public class Cuenta {
     this.movimientos = movimientos;
   }
 
-  public void poner(double cuanto) {
+  
+  public void poner(double cuanto) {//LONG METHOD
+	 chequeoMontoNegativo(cuanto);
     /*//logica repetida en 1 DUPLICATED CODE
      * if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
     }*/
-	chequeoMontoNegativo(cuanto);
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
+	chequeoMaximaCantidadDeDepositosEnElDia(getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count());
+    /*
+     * if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
-
-    new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
+    */
+    agregarMovimiento(cuanto);
+    //new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
   }
-  
-  
- 
 
-  public void sacar(double cuanto) {
+  public void sacar(double cuanto) {//LONG METHOD
+	chequeoMontoNegativo(cuanto);
     /*1) logica repetida DUPLICATED CODE
      * if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
     }*/
-	chequeoMontoNegativo(cuanto);
+	
+	chequeoSaldo(cuanto);
+	/*
     if (getSaldo() - cuanto < 0) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
-    }
-    double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
+    }*/
+    /*Temporary Field..
+     * double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
+     * */
     /*
      * Temporary Field...
      * double limite = 1000 - montoExtraidoHoy;
      */
-    
-    if (cuanto > limite(1000, montoExtraidoHoy)) {
+    chequeoMaximaExtraccionPorDia(cuanto);
+    /*
+ 	if (cuanto > limite(1000, getMontoExtraidoA(LocalDate.now()))) {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
-          + " diarios, límite: " + limite(1000, montoExtraidoHoy));
+          + " diarios, límite: " + limite(1000, getMontoExtraidoA(LocalDate.now())));
     }
-    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+    */
+    agregarMovimiento(cuanto);
+    //new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
   }
   
   
+  //Creo este metodo para solucionar el smell 3 LONG METHOD
+  private void chequeoSaldo(double cuanto) {
+	  if (getSaldo() - cuanto < 0) {
+	      throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
+	    }
+  }
   
-  //Creo este metodo para solucionar el smell 2
+  //Creo este metodo para solucionar el smell 3 LONG METHOD
+  private void chequeoMaximaExtraccionPorDia(double cuanto) {
+	  if (cuanto > limite(1000, getMontoExtraidoA(LocalDate.now()))) {
+	      throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
+	          + " diarios, límite: " + limite(1000, getMontoExtraidoA(LocalDate.now())));
+	    }
+  }
+  
+  //Creo este metodo para solucionar el smell 3 LONG METHOD
+  private void chequeoMaximaCantidadDeDepositosEnElDia(long depositosDelDia) {
+	  if (depositosDelDia>= 3) {
+	      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
+	  }
+  }
+  
+  //Creo este metodo para solucionar el smell 3 LONG METHOD
+  private void  agregarMovimiento(double cuanto){
+	//Aca mismo se genera otro smell, que se da en "movimiento" -> FEATURE ENVY
+	  //ya que en movimiento el metodo "agregateA" pide mucha informacion de la cuenta, cuando podemos hacer lo mismo que hace ese metodo, aca.
+	  //
+	  new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+  }
+  
+  //Creo este metodo para solucionar el smell 2 DUPLICATED CODE
   private void chequeoMontoNegativo(double cuanto) {
 	  if (cuanto <= 0) {
 	      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
 	  }
   }
 
-  //Creo este metodo para solucionar el smell 1
+  //Creo este metodo para solucionar el smell 1 TEMPORARY FIELD
   private double limite(int montoX, double montoExtraidoHoy) {
 	  return montoX - montoExtraidoHoy;
   }
+  
 
 public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
     Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
