@@ -39,7 +39,7 @@ public class Cuenta {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
     */
-    agregarMovimiento(cuanto);
+    agregarMovimiento(cuanto, true);
     //new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
   }
 
@@ -69,7 +69,7 @@ public class Cuenta {
           + " diarios, límite: " + limite(1000, getMontoExtraidoA(LocalDate.now())));
     }
     */
-    agregarMovimiento(cuanto);
+    agregarMovimiento(cuanto, false);
     //new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
   }
   
@@ -97,12 +97,23 @@ public class Cuenta {
   }
   
   //Creo este metodo para solucionar el smell 3 LONG METHOD
-  private void  agregarMovimiento(double cuanto){
-	//Aca mismo se genera otro smell, que se da en "movimiento" -> FEATURE ENVY
+  private void  agregarMovimiento(double cuanto, boolean esDeposito){
+	  //Aca mismo se genera otro smell, que se da en "movimiento" -> FEATURE ENVY
 	  //ya que en movimiento el metodo "agregateA" pide mucha informacion de la cuenta, cuando podemos hacer lo mismo que hace ese metodo, aca.
-	  //
-	  new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+	  
+	  setSaldo(calcularValor(cuanto,esDeposito));
+	  agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, esDeposito));
+	  
   }
+  
+//Creo este metodo para solucionar el smell 4 FEATURE ENVY
+  private double calcularValor(double cuanto,boolean esDeposito) {
+	    if (esDeposito) {
+	      return getSaldo() + cuanto;
+	    } else {
+	      return getSaldo() - cuanto;
+	    }
+	  }
   
   //Creo este metodo para solucionar el smell 2 DUPLICATED CODE
   private void chequeoMontoNegativo(double cuanto) {
