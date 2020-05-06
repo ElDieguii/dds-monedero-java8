@@ -27,10 +27,11 @@ public class Cuenta {
   }
 
   public void poner(double cuanto) {
-    if (cuanto <= 0) {
+    /*//logica repetida en 1 DUPLICATED CODE
+     * if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
-
+    }*/
+	chequeoMontoNegativo(cuanto);
     if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
@@ -42,9 +43,11 @@ public class Cuenta {
  
 
   public void sacar(double cuanto) {
-    if (cuanto <= 0) {
+    /*1) logica repetida DUPLICATED CODE
+     * if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
+    }*/
+	chequeoMontoNegativo(cuanto);
     if (getSaldo() - cuanto < 0) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
@@ -60,8 +63,17 @@ public class Cuenta {
     }
     new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
   }
+  
+  
+  
+  //Creo este metodo para solucionar el smell 2
+  private void chequeoMontoNegativo(double cuanto) {
+	  if (cuanto <= 0) {
+	      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
+	  }
+  }
 
-  //Creo este metodo para solucionar el smell
+  //Creo este metodo para solucionar el smell 1
   private double limite(int montoX, double montoExtraidoHoy) {
 	  return montoX - montoExtraidoHoy;
   }
