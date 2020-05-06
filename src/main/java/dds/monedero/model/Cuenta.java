@@ -128,9 +128,9 @@ public class Cuenta {
   }
   
 
-public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
-    Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
-    movimientos.add(movimiento);
+//LONG PARAMETER LIST
+public void agregarMovimiento(Movimiento unMovimiento) {
+    movimientos.add(unMovimiento);
   }
 
   public double getMontoExtraidoA(LocalDate fecha) {
