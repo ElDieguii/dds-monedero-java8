@@ -29,7 +29,6 @@ public class Cuenta {
   
   public void poner(double cuanto) {//LONG METHOD
 	  
-	try {
 	chequeoMontoNegativo(cuanto);
     /*//logica repetida en 1 DUPLICATED CODE
      * if (cuanto <= 0) {
@@ -43,15 +42,10 @@ public class Cuenta {
     */
     agregarMovimiento(cuanto, true);
     //new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
-	}catch(MontoNegativoException e) {
-		throw new MontoNegativoException(""+e);
-	}catch(MaximaCantidadDepositosException e) {
-		throw new MaximaCantidadDepositosException(""+e);
-	}
+
   }
 
   public void sacar(double cuanto) {//LONG METHOD
-	try {
 	chequeoMontoNegativo(cuanto);
     /*1) logica repetida DUPLICATED CODE
      * if (cuanto <= 0) {
@@ -79,13 +73,7 @@ public class Cuenta {
     */
     agregarMovimiento(cuanto, false);
     //new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
-	}catch(MontoNegativoException e){
-		throw new MontoNegativoException(""+e);
-	}catch(SaldoMenorException e){
-		 throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
-	}catch(MaximoExtraccionDiarioException e){
-		 throw new MaximoExtraccionDiarioException(""+e);
-	}
+
   }
   
   
